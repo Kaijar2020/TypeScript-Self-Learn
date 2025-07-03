@@ -5,7 +5,7 @@ test.describe('Login', () => {
   let loginPage: LoginPage;
   test.beforeEach(async ({page}) => {
     loginPage = new LoginPage(page);
-    await loginPage.goto();
+    await page.goto('/scohn/login'); // Navigate to the login page
   });
 
   test('Login with valid credentials and PIN', async ({page}) => {
