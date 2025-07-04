@@ -1,12 +1,14 @@
-import{test,expect}from'@playwright/test';
+import{test,expect, type Page}from'@playwright/test';
 import{LoginPage}from'../pages/LoginPage'; 
 import{MyDocumentPage}from'../pages/MyDocumentPage';
 
 test.describe('MyDocument', () => {
+  let page: Page; // Declare page variable to hold the page instance
   let loginPage: LoginPage;
   let documentPage: MyDocumentPage;
 
-  test.beforeEach(async ({page}) => {
+  test.beforeAll(async ({browser}) => {
+    page = await browser.newPage(); // Create a new page instance
     loginPage = new LoginPage(page);
     documentPage = new MyDocumentPage(page);
     await page.goto('/scohn/login'); // Navigate to the login page
@@ -16,9 +18,22 @@ test.describe('MyDocument', () => {
     await loginPage.clickLogin();
   });
 
-  test('should display the document correctly', async ({page}) => {
+  test.afterAll(async () => {
+    await page.close(); // Close the browser after tests
+  });
+
+  test('should display the document correctly', async () => {
     await documentPage.navigateToDocumentPage();
-    console.log(await documentPage.isDocumentPageVisible());
     expect(await documentPage.isDocumentPageVisible()).toBeTruthy();
+  });
+
+  test('should navigate to add new document page', async () => {
+    await documentPage.clickAddNewDocumentButton();
+    expect(await documentPage.isAddNewDocumentPageVisible()).toBeTruthy();
+    await page.waitForTimeout(1000); // Wait for 1 second to ensure the page is loaded
+  });
+
+  test('Should upload a document', async () => {
+
   });
 })
