@@ -30,10 +30,13 @@ test.describe('MyDocument', () => {
   test('should navigate to add new document page', async () => {
     await documentPage.clickAddNewDocumentButton();
     expect(await documentPage.isAddNewDocumentPageVisible()).toBeTruthy();
-    await page.waitForTimeout(1000); // Wait for 1 second to ensure the page is loaded
   });
 
   test('Should upload a document', async () => {
-
+    await documentPage.uploadDocument();
+    expect(documentPage.isFileUploaded()).toBeTruthy();
+    expect(await documentPage.saveButtonisenabled()).toBeFalsy();
+    await documentPage.validateListItem();
+    await page.waitForTimeout(2000); // Wait for 2 seconds to ensure the document is uploaded
   });
 })
