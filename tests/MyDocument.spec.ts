@@ -22,21 +22,39 @@ test.describe('MyDocument', () => {
     await page.close(); // Close the browser after tests
   });
 
-  test('should display the document correctly', async () => {
+  test('1.should display the document correctly', async () => {
     await documentPage.navigateToDocumentPage();
     expect(await documentPage.isDocumentPageVisible()).toBeTruthy();
   });
 
-  test('should navigate to add new document page', async () => {
+  test('2.should navigate to add new document page', async () => {
     await documentPage.clickAddNewDocumentButton();
     expect(await documentPage.isAddNewDocumentPageVisible()).toBeTruthy();
   });
 
-  test('Should upload a document', async () => {
+  test('3.Should upload a document', async () => {
     await documentPage.uploadDocument();
     expect(documentPage.isFileUploaded()).toBeTruthy();
     expect(await documentPage.saveButtonisenabled()).toBeFalsy();
-    await documentPage.validateListItem();
-    await page.waitForTimeout(2000); // Wait for 2 seconds to ensure the document is uploaded
   });
-})
+
+  test("4.Fill the document details.", async () => {
+    await documentPage.selectDocumentType('Invoice');
+    await documentPage.typeTags(['Test Tag', 'Sample Tag']);
+    await documentPage.typeDescription('This is a sample document description.It is typing by a Automation bot.');
+    // expect(await documentPage.saveButtonisenabled()).toBeTruthy();
+    await documentPage.clickSaveButton();
+    expect(await documentPage.docUploadCheck()).toBe(' Success Document Uploaded Successfully!');
+  });
+
+  test('5.Should delete the document', async () => {
+    await page.waitForTimeout(2000); 
+    await documentPage.docmentDelete();
+    expect(await documentPage.docDeleteCheck()).toBe(' Success Document Deleted Successfully!');
+    await page.waitForTimeout(2000); // Wait for 2 seconds to ensure the document is deleted
+  });
+
+
+
+
+});

@@ -18,6 +18,11 @@ export class MyDocumentPage {
     private addDescription: Locator;
     private cancelButton: Locator;
     private dateField: Locator;
+    private docUploadToastMsg: Locator;
+    private docMenuBtn: Locator;
+    private docDeleteBtn: Locator;
+    private docEditBtn: Locator;
+    private docDeleteToastMsg: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -28,13 +33,19 @@ export class MyDocumentPage {
     this.chooseFileButton = this.page.locator("input[type='file']");
     this.fileExistance = this.page.locator("div.file-info-container");
     this.saveButton = this.page.locator("button[type='submit']");
-    this.documentType = this.page.locator("#pn_id_16");
+    this.documentType = this.page.getByPlaceholder('Select record type');
+    // this.documentType = this.page.locator("//span[@aria-label='Select record type']");
     this.documentTypeList = this.page.locator("ul>p-selectitem>li");
     this.documentFor = this.page.locator("#pn_id_101");
     this.addTags = this.page.locator("div.tag-container");
     this.addDescription = this.page.locator("textarea[placeholder='Enter additional details about this document']");
     this.cancelButton = this.page.locator("//span[normalize-space(text())='Cancel']");
     this.dateField = this.page.locator("input[role='combobox']");
+    this.docUploadToastMsg = this.page.locator("div").filter({ hasText: 'Success Document Uploaded' }).nth(2);
+    this.docMenuBtn = this.page.locator("p-speeddial").getByRole("button");
+    this.docDeleteBtn = this.page.locator('//ul[@class="p-speeddial-list"]/li[2]');
+    this.docEditBtn = this.page.locator("#pn_id_67_0").getByRole("menuitem");
+    this.docDeleteToastMsg = this.page.locator('div').filter({ hasText: 'Success Document Deleted' }).nth(2);
   }
 
   async navigateToDocumentPage() {
@@ -65,10 +76,58 @@ export class MyDocumentPage {
     return await this.saveButton.isEnabled();
   }
 
-  async validateListItem() {
-    await this.documentType.click();
-    const listItems = await this.documentTypeList.all();
-    console.log("List items count: ", listItems.length);
-    console.log("List items text: "+listItems);
+  async clickSaveButton() {
+    await this.saveButton.click();
   }
+
+  // async validateListItem() {
+  //   await this.documentType.click();
+  //   const listItems = await this.documentTypeList.all();
+  //   let count = 0
+  //   for (const item of listItems) {
+  //     count++;
+  //   }
+  //   return count;
+  // }
+
+  async selectDocumentType(type: string) {
+    await this.documentType.waitFor({ state: 'visible', timeout: 1500 });
+    await this.documentType.click();
+    let options = await this.documentTypeList.all();
+    for (let option of options) {
+      if (await option.textContent() === type) {
+        await option.click();
+        break;
+      }
+    }
+  }
+  async typeTags(tags: string[]) {
+    for (const tag of tags) {
+      await this.addTags.click();
+      await this.page.keyboard.type(tag);
+      await this.page.keyboard.press('Enter');
+    }
+  }
+  async typeDescription(description: string) {
+    await this.addDescription.fill(description);
+  }
+  async docUploadCheck() {
+    await this.docUploadToastMsg.waitFor({ state: 'visible', timeout: 2000 });
+    return await this.docUploadToastMsg.textContent();
+  }
+  async docmentDelete(){
+    const menuitems = await this.docMenuBtn.all();
+    for (let item of menuitems) {
+        await item.waitFor({ state: 'visible', timeout: 5000 });
+        await item.click({force: true});
+        await this.docDeleteBtn.waitFor({ state: 'visible' });
+        await this.docDeleteBtn.click({force: true});
+    }
+  }
+
+  async docDeleteCheck() {
+    await this.docDeleteToastMsg.waitFor({ state: 'visible', timeout: 5000 });
+    return await this.docDeleteToastMsg.textContent();
+  }
+
 }
