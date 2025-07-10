@@ -1,14 +1,17 @@
-import {test, expect} from '@playwright/test';
+import {test,Page, expect} from '@playwright/test';
 import {LoginPage} from '../pages/LoginPage';
 
 test.describe('Login', () => {
   let loginPage: LoginPage;
-  test.beforeEach(async ({page}) => {
+  let page: Page;
+
+  test.beforeEach(async ({browser}) => {
+    page = await browser.newPage();
     loginPage = new LoginPage(page);
-    await page.goto('/scohn/login'); // Navigate to the login page
+    await page.goto('https://umrtest.com/scohn/login'); // Navigate to the login page
   });
 
-  test('Login with valid credentials and PIN', async ({page}) => {
+  test('Login with valid credentials and PIN', async () => {
     await loginPage.enterUsername('white@yopmail.com');
     await loginPage.clickNext();
     await loginPage.enterPin('123456');

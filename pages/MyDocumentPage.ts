@@ -23,6 +23,8 @@ export class MyDocumentPage {
     private docDeleteBtn: Locator;
     private docEditBtn: Locator;
     private docDeleteToastMsg: Locator;
+    private docViewBtn: Locator;
+    private docCloseBtn: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -34,7 +36,6 @@ export class MyDocumentPage {
     this.fileExistance = this.page.locator("div.file-info-container");
     this.saveButton = this.page.locator("button[type='submit']");
     this.documentType = this.page.getByPlaceholder('Select record type');
-    // this.documentType = this.page.locator("//span[@aria-label='Select record type']");
     this.documentTypeList = this.page.locator("ul>p-selectitem>li");
     this.documentFor = this.page.locator("#pn_id_101");
     this.addTags = this.page.locator("div.tag-container");
@@ -43,9 +44,11 @@ export class MyDocumentPage {
     this.dateField = this.page.locator("input[role='combobox']");
     this.docUploadToastMsg = this.page.locator("div").filter({ hasText: 'Success Document Uploaded' }).nth(2);
     this.docMenuBtn = this.page.locator("p-speeddial").getByRole("button");
-    this.docDeleteBtn = this.page.locator('//ul[@class="p-speeddial-list"]/li[2]');
-    this.docEditBtn = this.page.locator("#pn_id_67_0").getByRole("menuitem");
+    this.docDeleteBtn = this.page.locator("(//li[@class='p-speeddial-item ng-star-inserted']//button)[2]");
+    this.docEditBtn = this.page.locator("(//li[@class='p-speeddial-item ng-star-inserted']//button)[1]");
     this.docDeleteToastMsg = this.page.locator('div').filter({ hasText: 'Success Document Deleted' }).nth(2);
+    this.docViewBtn = this.page.getByText('View Document').first();
+    this.docCloseBtn = this.page.getByRole('button', { name: 'Close' });
   }
 
   async navigateToDocumentPage() {
@@ -80,6 +83,10 @@ export class MyDocumentPage {
     await this.saveButton.click();
   }
 
+  async clickCancelButton() {
+    await this.cancelButton.click(); 
+  }
+
   // async validateListItem() {
   //   await this.documentType.click();
   //   const listItems = await this.documentTypeList.all();
@@ -91,12 +98,12 @@ export class MyDocumentPage {
   // }
 
   async selectDocumentType(type: string) {
-    await this.documentType.waitFor({ state: 'visible', timeout: 1500 });
+    await this.documentType.waitFor({ state: 'visible', timeout: 2000 });
     await this.documentType.click();
     let options = await this.documentTypeList.all();
     for (let option of options) {
       if (await option.textContent() === type) {
-        await option.click();
+        await option.click({ force: true });
         break;
       }
     }
@@ -116,18 +123,24 @@ export class MyDocumentPage {
     return await this.docUploadToastMsg.textContent();
   }
   async docmentDelete(){
-    const menuitems = await this.docMenuBtn.all();
-    for (let item of menuitems) {
-        await item.waitFor({ state: 'visible', timeout: 5000 });
-        await item.click({force: true});
-        await this.docDeleteBtn.waitFor({ state: 'visible' });
-        await this.docDeleteBtn.click({force: true});
-    }
+        await this.docMenuBtn.waitFor({ state: 'visible', timeout: 1000 });
+        await this.docMenuBtn.click({force: true});
+        await this.docDeleteBtn.waitFor({ state: 'visible',timeout: 1000 });
+        await this.docDeleteBtn.click();
+  }
+  async docDeleteCheck() {
+    await this.docDeleteToastMsg.waitFor({ state: 'visible', timeout: 2000 });
+    return await this.docDeleteToastMsg.textContent();
   }
 
-  async docDeleteCheck() {
-    await this.docDeleteToastMsg.waitFor({ state: 'visible', timeout: 5000 });
-    return await this.docDeleteToastMsg.textContent();
+  async clickDocViewBtn() {
+    await this.docViewBtn.waitFor({ state: 'visible' });
+    await this.docViewBtn.click();
+  }
+
+  async clickDocCloseBtn() {
+    await this.docCloseBtn.waitFor({ state: 'visible' });
+    await this.docCloseBtn.click();
   }
 
 }

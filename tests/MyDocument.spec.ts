@@ -1,6 +1,7 @@
 import{test,expect, type Page}from'@playwright/test';
 import{LoginPage}from'../pages/LoginPage'; 
 import{MyDocumentPage}from'../pages/MyDocumentPage';
+import data from '../test-datas/data.json';
 
 test.describe('MyDocument', () => {
   let page: Page; // Declare page variable to hold the page instance
@@ -11,10 +12,10 @@ test.describe('MyDocument', () => {
     page = await browser.newPage(); // Create a new page instance
     loginPage = new LoginPage(page);
     documentPage = new MyDocumentPage(page);
-    await page.goto('/scohn/login'); // Navigate to the login page
-    await loginPage.enterUsername('white@yopmail.com');
+    await page.goto(data.baseURL); 
+    await loginPage.enterUsername(data.email);
     await loginPage.clickNext();
-    await loginPage.enterPin('123456');
+    await loginPage.enterPin(data.password);
     await loginPage.clickLogin();
   });
 
@@ -39,18 +40,23 @@ test.describe('MyDocument', () => {
   });
 
   test("4.Fill the document details.", async () => {
-    await documentPage.selectDocumentType('Invoice');
-    await documentPage.typeTags(['Test Tag', 'Sample Tag']);
-    await documentPage.typeDescription('This is a sample document description.It is typing by a Automation bot.');
+    await documentPage.selectDocumentType(data.document_type);
+    await documentPage.typeTags(data.tags);
+    await documentPage.typeDescription(data.document_description);
     // expect(await documentPage.saveButtonisenabled()).toBeTruthy();
     await documentPage.clickSaveButton();
-    expect(await documentPage.docUploadCheck()).toBe(' Success Document Uploaded Successfully!');
+    expect(await documentPage.docUploadCheck()).toBe(data.document_upload_success_message);
   });
 
-  test('5.Should delete the document', async () => {
-    await page.waitForTimeout(2000); 
+  test('5.Should view the document', async () => {
+    await documentPage.clickDocViewBtn();
+    await documentPage.clickDocCloseBtn();
+  });
+
+  test('6.Should delete the document', async () => {
+    await page.waitForTimeout(1500); 
     await documentPage.docmentDelete();
-    expect(await documentPage.docDeleteCheck()).toBe(' Success Document Deleted Successfully!');
+    expect(await documentPage.docDeleteCheck()).toBe(data.document_delete_success_message);
     await page.waitForTimeout(2000); // Wait for 2 seconds to ensure the document is deleted
   });
 
