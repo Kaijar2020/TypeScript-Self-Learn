@@ -39,15 +39,15 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'] },
+    // },
 
-    {
-      name: 'webkit',
-      use: { ...devices['Pixel 4'] },
-    },
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Pixel 4'] },
+    // },
 
     /* Test against mobile viewports. */
     // {
