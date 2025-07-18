@@ -10,7 +10,7 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.usernameInput = page.locator('input[type="email"], input[type="text"]').first();
+    this.usernameInput = page.getByRole('textbox', { name: 'Email ID / Mobile NO. *' });
     this.nextButton = page.locator('button:has-text("Next")');
     this.passwordInputs = page.locator("//input[@type='password']");
     this.loginButton = page.locator('button:has-text("Login")');
