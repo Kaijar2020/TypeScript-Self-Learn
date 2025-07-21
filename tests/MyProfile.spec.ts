@@ -26,10 +26,9 @@ test.describe('MyProfile', () => {
       });
 
       test('2.Should display general information values', async () => {
-            //await page.waitForTimeout(1000);
-            expect(await profilePage.getGeneralInfoValues()).toBeTruthy();
+            await page.waitForTimeout(1000);
             val = await profilePage.getGeneralInfoValues();
-            console.log(val);
+            expect(val).toBeTruthy();
       });
 
       test('3.Should navigate to Update Profile page', async () => {
@@ -38,15 +37,24 @@ test.describe('MyProfile', () => {
       });
 
       test('4.Should Verify the Update profile form ', async () => {
-            await page.waitForTimeout(2000);
+            await page.waitForTimeout(1000);
             let arr: string[];
             arr = await profilePage.verifyFormValues();
-            console.log(arr);
-            console.log(val);
             expect(arr[0]).toBe(val[1]);
       });
 
+      test.skip('5.Should click back button to return to My Profile Page', async () => {
+            await profilePage.clickbackButton();
+            expect(await profilePage.isProfilePageVisible()).toBeTruthy();
+      });
 
+      test('6.Should able to update user profile', async () => {
+            // await profilePage.clickUpdateProfileButton();
+            await profilePage.updateProfile(data.updateLastName, data.updateProfession);
+            await profilePage.navigateToProfilePage();
+            const updatedValues = await profilePage.getGeneralInfoValues();
+            expect(updatedValues[2]).toBe(data.updateLastName);
+      });
 
 
 });

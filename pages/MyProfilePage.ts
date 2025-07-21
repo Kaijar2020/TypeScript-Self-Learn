@@ -1,7 +1,7 @@
 import { Locator, Page } from "@playwright/test";
-import { BasePage } from "./BasePage";
 
-export class MyProfilePage extends BasePage {
+
+export class MyProfilePage {
   protected profilePage: Locator;
   protected generalInfoValue: Locator;
   protected profilePageUrl: string;
@@ -16,9 +16,10 @@ export class MyProfilePage extends BasePage {
   protected submitButton: Locator;
   protected cancelButton: Locator;
   protected bloodGroup: Locator;
+  protected page: Page;
 
   constructor(page: Page) {
-    super(page);
+    this.page = page;
     this.profilePage = this.page.locator('[data-tooltip="My Profile"]');
     this.generalInfoValue = this.page.locator('//div[@class="info-grid"]//div[@class="info-value"]');
     this.updateProfileButton = this.page.locator("//div[@class='update-profile-link']/a");
@@ -35,14 +36,22 @@ export class MyProfilePage extends BasePage {
     this.cancelButton = this.page.getByRole('button', { name: 'Back' });
   }
 
+  async _writeProfile(locator: Locator, value: string) {
+    await locator.click({ force: true }); // ensure it's focused
+    await locator.press('Control+A');
+    await locator.press('Backspace');
+    await locator.fill(''); // clear any existing text
+    await locator.type(value, { delay: 100 }); // simulates real typing
 
+  }
 
   async navigateToProfilePage() {
-    await this._click(this.profilePage);
+    await this.profilePage.click();
   }
 
   async isProfilePageVisible() {
-    return await this._verifyURL(this.profilePageUrl);
+    const url = this.page.url();
+    return url.includes(this.profilePageUrl) ? true : false;
   }
 
   async getGeneralInfoValues() {
@@ -51,21 +60,23 @@ export class MyProfilePage extends BasePage {
     const count = await this.generalInfoValue.count();
     for (let i = 0; i < count; i++) {
       const infoValue = this.generalInfoValue.nth(i);
-      values.push(await this._getText(infoValue));
+      values.push(await infoValue.textContent() ?? '');
     }
     return values;
   }
 
   async isUpdateProfilePageVisible() {
-    return await this._verifyURL(this.updateProfileUrl);
+    const url = this.page.url();
+    return url.includes(this.updateProfileUrl) ? true : false;
   }
 
   async clickUpdateProfileButton() {
-    await this._click(this.updateProfileButton);
+    await this.updateProfileButton.click();
   }
 
   async verifyFormValues() {
     const field_values: string[] = [];
+    await this.page.waitForTimeout(1000);
     field_values.push(await this.firstName.inputValue());
     field_values.push(await this.lastName.inputValue());
     field_values.push(await this.dateOfBirth.inputValue());
@@ -73,6 +84,16 @@ export class MyProfilePage extends BasePage {
     field_values.push(await this.emailID.inputValue());
     field_values.push(await this.bloodGroup.inputValue());
     return field_values;
+  }
+
+  async clickbackButton() {
+    await this.cancelButton.click();
+  }
+
+  async updateProfile(lastName: string, profession: string) {
+    await this._writeProfile(this.lastName, lastName);
+    await this._writeProfile(this.profession, profession);
+    await this.submitButton.click();
   }
 
 
