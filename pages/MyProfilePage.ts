@@ -16,6 +16,8 @@ export class MyProfilePage {
   protected submitButton: Locator;
   protected cancelButton: Locator;
   protected bloodGroup: Locator;
+  private profileUpdateSuccessToast: Locator;
+  private updateProfileDashboard: Locator;
   protected page: Page;
 
   constructor(page: Page) {
@@ -34,6 +36,8 @@ export class MyProfilePage {
     this.phoneNumber = this.page.locator("div.phone-input-container");
     this.submitButton = this.page.getByRole('button', { name: 'Submit' });
     this.cancelButton = this.page.getByRole('button', { name: 'Back' });
+    this.profileUpdateSuccessToast = this.page.locator('div').filter({ hasText: 'Success Profile updated' }).nth(2);
+    this.updateProfileDashboard = this.page.getByRole('link', { name: 'Update Profile ' });
   }
 
   async _writeProfile(locator: Locator, value: string) {
@@ -94,6 +98,15 @@ export class MyProfilePage {
     await this._writeProfile(this.lastName, lastName);
     await this._writeProfile(this.profession, profession);
     await this.submitButton.click();
+  }
+
+  async profileUpdateCheck() {
+    await this.profileUpdateSuccessToast.waitFor({ state: 'visible', timeout: 2000 });
+    return await this.profileUpdateSuccessToast.textContent();
+  }
+
+  async updateProfileDashboardCheck() {
+    await this.updateProfileDashboard.click();
   }
 
 

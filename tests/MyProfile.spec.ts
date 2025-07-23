@@ -8,6 +8,7 @@ test.describe('MyProfile', () => {
       let loginPage: LoginPage;
       let profilePage: MyProfilePage;
       let val: string[];
+      let arr: string[];
 
       test.beforeAll(async ({ browser }) => {
             page = await browser.newPage();
@@ -36,24 +37,25 @@ test.describe('MyProfile', () => {
             expect(await profilePage.isUpdateProfilePageVisible()).toBeTruthy();
       });
 
-      test('4.Should Verify the Update profile form ', async () => {
-            await page.waitForTimeout(1000);
-            let arr: string[];
+      test('4.Should verify the Update profile form ', async () => {
+            await page.waitForTimeout(2000);
             arr = await profilePage.verifyFormValues();
             expect(arr[0]).toBe(val[1]);
       });
 
-      test.skip('5.Should click back button to return to My Profile Page', async () => {
-            await profilePage.clickbackButton();
-            expect(await profilePage.isProfilePageVisible()).toBeTruthy();
-      });
-
-      test('6.Should able to update user profile', async () => {
-            // await profilePage.clickUpdateProfileButton();
+      test('5.Should able to update user profile', async () => {
+            //await profilePage.clickUpdateProfileButton();
             await profilePage.updateProfile(data.updateLastName, data.updateProfession);
             await profilePage.navigateToProfilePage();
             const updatedValues = await profilePage.getGeneralInfoValues();
+            expect(await profilePage.profileUpdateCheck()).toBe(data.profile_update_success_message);
             expect(updatedValues[2]).toBe(data.updateLastName);
+      });
+
+      test('6.Should click back button to return to My Profile Page', async () => {
+            await profilePage.updateProfileDashboardCheck();
+            await profilePage.clickbackButton();
+            expect(await profilePage.isProfilePageVisible()).toBeTruthy();
       });
 
 
